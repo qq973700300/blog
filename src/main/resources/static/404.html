@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 · 舞者走丢了</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/blog.css">
+</head>
+<body class="not-found-page">
+
+  <header class="blog-header">
+    <a class="blog-logo" href="/">同羽</a>
+    <nav class="blog-nav">
+      <a href="/">首页</a>
+      <a href="/blog">博客</a>
+    </nav>
+  </header>
+
+  <main class="not-found-main">
+    <div class="lost-stage">
+      <div class="lost-dancer" id="lost-dancer" aria-hidden="true">
+        <svg viewBox="0 0 64 96" class="lost-svg">
+          <ellipse cx="32" cy="90" rx="18" ry="4" fill="rgba(0,0,0,0.3)"/>
+          <g class="lost-body">
+            <rect x="22" y="34" width="20" height="26" rx="5" fill="#ff2d95"/>
+            <rect x="10" y="38" width="16" height="6" rx="3" fill="#b44dff"/>
+            <rect x="38" y="38" width="16" height="6" rx="3" fill="#b44dff"/>
+            <rect x="24" y="58" width="8" height="24" rx="3" fill="#00f5ff"/>
+            <rect x="32" y="58" width="8" height="24" rx="3" fill="#00f5ff"/>
+            <circle cx="32" cy="18" r="14" fill="#ffe600"/>
+            <circle cx="26" cy="17" r="2.2" fill="#0a0e17"/>
+            <circle cx="38" cy="17" r="2.2" fill="#0a0e17"/>
+            <path d="M24 24 Q32 28 40 24" stroke="#0a0e17" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          </g>
+        </svg>
+        <span class="lost-bubble">??? 我在哪...</span>
+      </div>
+
+      <h1 class="lost-title">404</h1>
+      <p class="lost-subtitle">这位舞者迷路了，页面不存在</p>
+
+      <div class="lost-terminal">
+        <div class="lost-term-bar">
+          <span class="lost-dot red"></span>
+          <span class="lost-dot yellow"></span>
+          <span class="lost-dot green"></span>
+          <span>lost-dancer@blog</span>
+        </div>
+        <div id="lost-output" class="lost-output">
+          <div>&gt; 输入 <strong>help</strong> 查看指引，或点击地图回首页</div>
+        </div>
+        <form id="lost-form" class="lost-form" autocomplete="off">
+          <label for="lost-cmd" class="sr-only">命令</label>
+          <span class="lost-prompt">&gt;</span>
+          <input id="lost-cmd" type="text" placeholder="help" maxlength="40" spellcheck="false">
+        </form>
+      </div>
+
+      <a href="/" class="lost-map-btn">🗺 回到首页舞台</a>
+    </div>
+  </main>
+
+  <script src="/js/not-found.js"></script>
+  <script src="/js/site-footer.js"></script>
+</body>
+</html>

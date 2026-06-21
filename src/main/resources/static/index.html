@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>同羽 · Blog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/dance.css?v=12">
+  <link rel="stylesheet" href="/css/social.css?v=9">
+  <script>window.__BLOG_MEDIA_V='20250617-birds-v1';</script>
+</head>
+<body class="booting">
+
+  <div id="boot-screen" class="boot-screen">
+    <div class="boot-terminal">
+      <div class="boot-bar">
+        <span class="boot-dot red"></span>
+        <span class="boot-dot yellow"></span>
+        <span class="boot-dot green"></span>
+        <span class="boot-title">xiewenwen@blog — bash</span>
+      </div>
+      <div id="boot-output" class="boot-output"></div>
+      <span class="boot-cursor">█</span>
+    </div>
+  </div>
+
+  <div id="party-layer" aria-hidden="true"></div>
+
+  <div id="danmaku-layer" aria-hidden="true"></div>
+
+  <button id="social-toggle" class="social-toggle" type="button">💬 互动</button>
+  <aside id="social-panel" class="social-panel">
+    <h3>舞者互动墙</h3>
+    <p id="high-five-count" class="social-stats">今日击掌 0</p>
+    <button id="high-five-btn" type="button">👏 击个掌</button>
+    <div id="mood-bars"></div>
+
+    <div class="leaderboard-section">
+      <h4>🏆 今日舞王榜</h4>
+      <div id="leaderboard-box" class="leaderboard-box"></div>
+    </div>
+
+    <div class="achievement-section">
+      <h4>🎖 我的成就</h4>
+      <div id="achievement-box" class="achievement-box"></div>
+    </div>
+
+    <form id="message-form" class="message-form">
+      <label for="msg-nickname">昵称</label>
+      <input id="msg-nickname" type="text" maxlength="12" placeholder="舞者代号" required>
+      <label for="msg-content">留言弹幕</label>
+      <input id="msg-content" type="text" maxlength="40" placeholder="留一句骚话或代码..." required>
+      <button type="submit">发射弹幕 🚀</button>
+    </form>
+  </aside>
+
+  <canvas id="code-rain"></canvas>
+  <video id="ascii-video-source" class="ascii-video-source" muted loop playsinline preload="auto" aria-hidden="true">
+    <source src="/video/ascii.mp4?v=20250617-birds-v1" type="video/mp4">
+  </video>
+  <div id="bug-hunt-layer" aria-hidden="true"></div>
+  <div class="scanlines"></div>
+
+  <div class="stage">
+    <div class="title-block">
+      <h1 class="title">同羽</h1>
+      <p class="subtitle">birds of a feather</p>
+      <a href="/blog" class="enter-blog-btn">进入博客 →</a>
+    </div>
+
+    <div class="dancers" id="dancers-stage"></div>
+  </div>
+
+  <div class="music-controls" id="music-controls">
+    <div class="paper-dancers paper-left" aria-hidden="true">
+      <div class="paper-person pp-1">
+        <svg viewBox="0 0 48 72" class="paper-svg">
+          <ellipse class="pp-shadow" cx="24" cy="68" rx="14" ry="3"/>
+          <g class="pp-leg-l"><rect x="14" y="44" width="7" height="22" rx="3" fill="#ff2d95"/></g>
+          <g class="pp-leg-r"><rect x="27" y="44" width="7" height="22" rx="3" fill="#ff2d95"/></g>
+          <rect class="pp-torso" x="16" y="26" width="16" height="20" rx="4" fill="#00f5ff"/>
+          <g class="pp-arm-l"><rect x="4" y="28" width="14" height="5" rx="2.5" fill="#b44dff"/></g>
+          <g class="pp-arm-r"><rect x="30" y="28" width="14" height="5" rx="2.5" fill="#b44dff"/></g>
+          <circle class="pp-head" cx="24" cy="14" r="11" fill="#ffe600"/>
+          <circle cx="20" cy="13" r="1.8" fill="#0a0e17"/>
+          <circle cx="28" cy="13" r="1.8" fill="#0a0e17"/>
+          <path d="M20 18 Q24 21 28 18" stroke="#0a0e17" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="paper-person pp-2">
+        <svg viewBox="0 0 48 72" class="paper-svg">
+          <ellipse class="pp-shadow" cx="24" cy="68" rx="14" ry="3"/>
+          <g class="pp-leg-l"><rect x="14" y="44" width="7" height="22" rx="3" fill="#39ff14"/></g>
+          <g class="pp-leg-r"><rect x="27" y="44" width="7" height="22" rx="3" fill="#39ff14"/></g>
+          <rect class="pp-torso" x="16" y="26" width="16" height="20" rx="4" fill="#ff2d95"/>
+          <g class="pp-arm-l"><rect x="4" y="28" width="14" height="5" rx="2.5" fill="#00f5ff"/></g>
+          <g class="pp-arm-r"><rect x="30" y="28" width="14" height="5" rx="2.5" fill="#00f5ff"/></g>
+          <circle class="pp-head" cx="24" cy="14" r="11" fill="#b44dff"/>
+          <circle cx="20" cy="13" r="1.8" fill="#fff"/>
+          <circle cx="28" cy="13" r="1.8" fill="#fff"/>
+          <path d="M19 17 Q24 20 29 17" stroke="#fff" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+
+    <button id="play-btn" class="play-btn" type="button" aria-label="播放视频">
+      <span class="play-icon">▶</span>
+      <span class="play-label">播放</span>
+    </button>
+
+    <div class="paper-dancers paper-right" aria-hidden="true">
+      <div class="paper-person pp-3">
+        <svg viewBox="0 0 48 72" class="paper-svg">
+          <ellipse class="pp-shadow" cx="24" cy="68" rx="14" ry="3"/>
+          <g class="pp-leg-l"><rect x="14" y="44" width="7" height="22" rx="3" fill="#00f5ff"/></g>
+          <g class="pp-leg-r"><rect x="27" y="44" width="7" height="22" rx="3" fill="#00f5ff"/></g>
+          <rect class="pp-torso" x="16" y="26" width="16" height="20" rx="4" fill="#ffe600"/>
+          <g class="pp-arm-l"><rect x="4" y="28" width="14" height="5" rx="2.5" fill="#ff2d95"/></g>
+          <g class="pp-arm-r"><rect x="30" y="28" width="14" height="5" rx="2.5" fill="#ff2d95"/></g>
+          <circle class="pp-head" cx="24" cy="14" r="11" fill="#39ff14"/>
+          <circle cx="20" cy="13" r="1.8" fill="#0a0e17"/>
+          <circle cx="28" cy="13" r="1.8" fill="#0a0e17"/>
+          <circle cx="24" cy="18" r="2" fill="#ff2d95"/>
+        </svg>
+      </div>
+      <div class="paper-person pp-4">
+        <svg viewBox="0 0 48 72" class="paper-svg">
+          <ellipse class="pp-shadow" cx="24" cy="68" rx="14" ry="3"/>
+          <g class="pp-leg-l"><rect x="14" y="44" width="7" height="22" rx="3" fill="#b44dff"/></g>
+          <g class="pp-leg-r"><rect x="27" y="44" width="7" height="22" rx="3" fill="#b44dff"/></g>
+          <rect class="pp-torso" x="16" y="26" width="16" height="20" rx="4" fill="#39ff14"/>
+          <g class="pp-arm-l"><rect x="4" y="28" width="14" height="5" rx="2.5" fill="#ffe600"/></g>
+          <g class="pp-arm-r"><rect x="30" y="28" width="14" height="5" rx="2.5" fill="#ffe600"/></g>
+          <circle class="pp-head" cx="24" cy="14" r="11" fill="#00f5ff"/>
+          <circle cx="20" cy="13" r="1.8" fill="#0a0e17"/>
+          <circle cx="28" cy="13" r="1.8" fill="#0a0e17"/>
+          <path d="M20 16 L24 20 L28 16" stroke="#0a0e17" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <p id="music-hint" class="enter-hint">点击 ▶ 让代码跳起来 · 连按空格有彩蛋 · 点红色 bug 除虫</p>
+
+  <div id="media-loader" class="media-loader" aria-live="polite" aria-busy="false">
+    <div class="media-loader-box">
+      <p id="media-loader-label" class="media-loader-label">正在下载视频信号...</p>
+      <div class="media-loader-track">
+        <div id="media-loader-fill" class="media-loader-fill"></div>
+      </div>
+      <p id="media-loader-pct" class="media-loader-pct">0%</p>
+    </div>
+  </div>
+
+  <div class="beat-bar">
+    <div class="beat-dot" style="height:12px"></div>
+    <div class="beat-dot" style="height:20px"></div>
+    <div class="beat-dot" style="height:28px"></div>
+    <div class="beat-dot" style="height:20px"></div>
+    <div class="beat-dot" style="height:12px"></div>
+    <div class="beat-dot" style="height:24px"></div>
+    <div class="beat-dot" style="height:16px"></div>
+    <div class="beat-dot" style="height:32px"></div>
+  </div>
+
+  <script src="/js/media-url.js?v=3"></script>
+  <script src="/js/music.js?v=12"></script>
+  <script src="/js/boot.js?v=9"></script>
+  <script src="/js/dancers.js?v=9"></script>
+  <script src="/js/ascii-video.js?v=9"></script>
+  <script src="/js/media-loader.js?v=9"></script>
+  <script src="/js/dance.js?v=17"></script>
+  <script src="/js/bug-hunt.js?v=9"></script>
+  <script src="/js/shake.js?v=9"></script>
+  <script src="/js/social.js?v=9"></script>
+  <script src="/js/site-footer.js"></script>
+</body>
+</html>

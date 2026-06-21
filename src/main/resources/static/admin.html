@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理后台 · 同羽</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/blog.css">
+</head>
+<body>
+  <header class="blog-header">
+    <a class="blog-logo" href="/">同羽</a>
+    <nav class="blog-nav">
+      <a href="/">首页</a>
+      <a href="/blog">博客</a>
+      <span class="admin-nav-label">管理</span>
+    </nav>
+  </header>
+
+  <main class="blog-main admin-main">
+    <section id="admin-login" class="admin-panel">
+      <h1>管理后台</h1>
+      <p class="admin-desc">登录后可删除博客上传的视频与首页留言。</p>
+      <form id="admin-login-form" class="admin-login-form">
+        <label for="admin-password">管理密码</label>
+        <input id="admin-password" type="password" autocomplete="current-password" required>
+        <button type="submit">登录</button>
+      </form>
+      <p id="admin-login-status" class="video-upload-status" aria-live="polite"></p>
+    </section>
+
+    <section id="admin-dashboard" class="admin-panel" hidden>
+      <div class="admin-toolbar">
+        <h1>管理后台</h1>
+        <button type="button" id="admin-logout-btn" class="admin-logout-btn">退出登录</button>
+      </div>
+
+      <div class="admin-tabs">
+        <button type="button" class="admin-tab active" data-tab="videos">上传视频</button>
+        <button type="button" class="admin-tab" data-tab="messages">首页留言</button>
+      </div>
+
+      <section id="admin-videos-panel" class="admin-tab-panel">
+        <p class="admin-panel-desc">删除后不可恢复，磁盘上的视频文件也会一并移除。</p>
+        <div id="admin-video-list" class="admin-list">
+          <p class="video-empty">加载中…</p>
+        </div>
+      </section>
+
+      <section id="admin-messages-panel" class="admin-tab-panel" hidden>
+        <p class="admin-panel-desc">删除后首页留言墙与舞台舞者列表会同步更新（最近 200 条）。</p>
+        <div id="admin-message-list" class="admin-list">
+          <p class="video-empty">加载中…</p>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script src="/js/admin.js?v=1"></script>
+  <script src="/js/site-footer.js"></script>
+</body>
+</html>

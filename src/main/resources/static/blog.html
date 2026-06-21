@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>博客文章 · 同羽</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/blog.css">
+</head>
+<body>
+  <header class="blog-header">
+    <a class="blog-logo" href="/">同羽</a>
+    <nav class="blog-nav">
+      <a href="/">首页</a>
+      <a href="/blog" class="active">博客</a>
+    </nav>
+  </header>
+
+  <main class="blog-main">
+    <section class="video-upload-section" id="video-upload">
+      <h2>🎬 视频 ASCII 解码</h2>
+      <p class="video-upload-desc">上传舞蹈视频，本站实时解码成字符画播放。小于 50MB 原片直存；≥50MB 自动压缩至 50MB 以下（24fps）。单文件上限 500MB。</p>
+      <form id="video-upload-form" class="video-upload-form">
+        <label for="video-nickname">昵称</label>
+        <input id="video-nickname" type="text" maxlength="12" placeholder="舞者代号" required>
+        <label for="video-file">视频文件</label>
+        <input id="video-file" type="file" accept="video/*" required>
+        <button type="submit">上传并入库</button>
+      </form>
+      <p id="video-upload-status" class="video-upload-status" aria-live="polite"></p>
+      <div id="video-upload-progress" class="video-upload-progress" hidden>
+        <div class="video-upload-track"><div id="video-upload-fill" class="video-upload-fill"></div></div>
+        <span id="video-upload-pct" class="video-upload-pct">0%</span>
+      </div>
+      <div id="video-list" class="video-list">
+        <p class="video-empty">加载视频列表...</p>
+      </div>
+    </section>
+
+    <section class="blog-hero">
+      <h1>舞者日志</h1>
+      <p>技术笔记、部署踩坑、互动功能幕后 —— 代码写下的故事。</p>
+    </section>
+    <div id="article-list" class="article-grid">
+      <p class="article-loading">加载文章中...</p>
+    </div>
+  </main>
+
+  <script src="/js/video-decode.js?v=3"></script>
+  <script src="/js/video-upload.js?v=8"></script>
+  <script src="/js/blog.js"></script>
+  <script src="/js/site-footer.js"></script>
+</body>
+</html>
