@@ -13,5 +13,7 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
 
 	boolean existsBySlug(String slug);
 
+	Optional<Article> findBySlug(String slug);
+
 	long countByPublishedTrue();
 }

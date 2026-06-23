@@ -65,6 +65,10 @@ public class Article {
 		return title;
 	}
 
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
 	public String getSlug() {
 		return slug;
 	}
@@ -75,6 +79,10 @@ public class Article {
 
 	public String getContent() {
 		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
 	}
 
 	public String getAccentColor() {

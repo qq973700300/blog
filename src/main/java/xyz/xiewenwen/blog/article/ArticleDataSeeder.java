@@ -341,7 +341,7 @@ public class ArticleDataSeeder implements ApplicationRunner {
 				"#00f5ff");
 
 		seedIfAbsent(
-				"我做了个联机游戏：涂鸦躲猫猫",
+				"我做了个联机游戏：躲猫猫",
 				"doodle-hide-and-seek-game",
 				"Spring Boot + WebSocket + Three.js，浏览器里联机躲猫猫——现在可以直接玩。",
 				"""
@@ -370,7 +370,7 @@ public class ArticleDataSeeder implements ApplicationRunner {
 
 				### 怎么玩
 
-				**[👉 点击进入游戏：涂鸦躲猫猫](https://xiewenwen.xyz/game/)**
+				**[👉 点击进入游戏：躲猫猫](https://xiewenwen.xyz/game/)**
 
 				1. 打开链接，输入昵称
 				2. 创建房间，或从列表加入（需要 **2 人** 才能开始）
@@ -388,6 +388,18 @@ public class ArticleDataSeeder implements ApplicationRunner {
 				> 欢迎留言反馈 bug，或者来我博客里击掌 🙌
 				""",
 				"#ff6b6b");
+
+		syncGameArticleTitle();
+	}
+
+	private void syncGameArticleTitle() {
+		articleRepository.findBySlug("doodle-hide-and-seek-game").ifPresent(article -> {
+			if (article.getTitle().contains("涂鸦")) {
+				article.setTitle("我做了个联机游戏：躲猫猫");
+				article.setContent(article.getContent().replace("涂鸦躲猫猫", "躲猫猫"));
+				articleRepository.save(article);
+			}
+		});
 	}
 
 	private void seedIfAbsent(String title, String slug, String summary, String content, String accentColor) {
