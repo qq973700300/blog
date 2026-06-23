@@ -13,7 +13,14 @@
 
 html, body {
   min-height: 100%;
-  background: var(--bg);
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(rgba(10, 14, 23, 0.78), rgba(10, 14, 23, 0.88)),
+    url('/images/blog-bg.png');
+  background-size: cover;
+  background-position: center center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
   color: #e0e6f0;
   font-family: "JetBrains Mono", "Fira Code", Consolas, monospace;
 }
