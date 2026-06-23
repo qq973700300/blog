@@ -339,6 +339,55 @@ public class ArticleDataSeeder implements ApplicationRunner {
 				> 回到首页点 ▶，亲眼看看代码里藏着的画面。
 				""",
 				"#00f5ff");
+
+		seedIfAbsent(
+				"我做了个联机游戏：涂鸦躲猫猫",
+				"doodle-hide-and-seek-game",
+				"Spring Boot + WebSocket + Three.js，浏览器里联机躲猫猫——现在可以直接玩。",
+				"""
+				## 这是什么
+
+				受 Steam 上 **MECCHA CHAMELEON**（变色龙躲猫猫）启发，我在浏览器里做了一个 **3D 联机版**：
+
+				- **躲藏者**：第三人称，WASD 移动，**E 键**伪装成场景里的树、箱子、长椅等道具
+				- **猎人**：第一人称持枪，鼠标瞄准射击
+				- **流程**：大厅组队 → 伪装 20 秒 → 寻找 60 秒 → 下一局
+
+				### 技术栈
+
+				```text
+				前端：Three.js（ES Module）+ WebSocket
+				后端：Spring Boot 4 + WebSocket + REST
+				部署：与博客同机，Nginx 反代 /game/
+				```
+
+				| 模块 | 说明 |
+				|------|------|
+				| 房间系统 | 创建/加入/离开，clientId 防幽灵玩家 |
+				| 实时同步 | MOVE / CAMOUFLAGE / SHOOT 走 WebSocket |
+				| 3D 场景 | 低多边形公园：树、车、滑梯、喷泉等可伪装道具 |
+				| 玩家模型 | 变色龙小人，伪装后切换为对应道具模型 |
+
+				### 怎么玩
+
+				**[👉 点击进入游戏：涂鸦躲猫猫](https://xiewenwen.xyz/game/)**
+
+				1. 打开链接，输入昵称
+				2. 创建房间，或从列表加入（需要 **2 人** 才能开始）
+				3. 两个浏览器标签页 / 两个浏览器即可本地联机测试
+				4. 进入场景 → 准备 → 房主开始
+
+				### 开发笔记
+
+				- 地图逻辑坐标 3200×2000，Three.js 场景 128×80
+				- 离开房间用 REST + WebSocket 双保险，定时清理断线玩家
+				- 移动方向按相机朝向计算，猎人第一人称 / 躲藏者第三人称
+
+				源码在 GitHub：[DoodleHideandSeek](https://github.com/qq973700300/DoodleHideandSeek)
+
+				> 欢迎留言反馈 bug，或者来我博客里击掌 🙌
+				""",
+				"#ff6b6b");
 	}
 
 	private void seedIfAbsent(String title, String slug, String summary, String content, String accentColor) {
