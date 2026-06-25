@@ -29,6 +29,9 @@ public class MediaCacheFilter implements Filter {
 			else if (path.startsWith("/uploads/")) {
 				res.setHeader("Cache-Control", "public, max-age=86400");
 			}
+			else if (path.startsWith("/downloads/")) {
+				res.setHeader("Cache-Control", "public, max-age=86400");
+			}
 			else if (path.startsWith("/audio/")) {
 				res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
 				res.setHeader("Pragma", "no-cache");
