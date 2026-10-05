@@ -2,14 +2,8 @@
   'use strict';
 
   const BOOT_LINES = [
-    { text: '> booting xiewenwen.xyz ...', delay: 0, pause: 420 },
-    { text: '> loading dance.module ........ OK', delay: 0, pause: 380 },
-    { text: '> loading music.module ........ OK', delay: 0, pause: 380 },
-    { text: '> loading blog-engine ....... OK', delay: 0, pause: 380 },
-    { text: '> initializing code-rain ...... OK', delay: 0, pause: 420 },
-    { text: '> tip: 连按空格 · 摇一摇有彩蛋 🐧', delay: 0, pause: 520, cls: 'boot-tip' },
-    { text: '> tip: 代码雨里的红色 bug，点它除虫 🐛', delay: 0, pause: 480, cls: 'boot-tip' },
-    { text: '> 按 Enter 或点击屏幕进入 ↵', delay: 0, pause: 0, cls: 'boot-enter' },
+    { text: '> xiewenwen.xyz', delay: 0, pause: 600 },
+    { text: '> press Enter ↵', delay: 0, pause: 0, cls: 'boot-enter' },
   ];
 
   const screen = document.getElementById('boot-screen');
