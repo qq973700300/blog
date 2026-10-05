@@ -1,13 +1,22 @@
 package xyz.xiewenwen.blog.social;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class SocialService {
@@ -15,20 +24,29 @@ public class SocialService {
 	private static final List<String> COLORS = List.of(
 			"#00f5ff", "#ff2d95", "#b44dff", "#39ff14", "#ffe600");
 
+	private static final Set<String> IMAGE_TYPES = Set.of("image/jpeg", "image/png", "image/gif", "image/webp");
+	private static final Set<String> VOICE_TYPES = Set.of(
+			"audio/webm", "audio/ogg", "audio/mpeg", "audio/mp4", "audio/wav", "audio/x-m4a");
+	private static final long MAX_IMAGE_BYTES = 5L * 1024 * 1024;
+	private static final long MAX_VOICE_BYTES = 2L * 1024 * 1024;
+
 	private final GuestMessageRepository messageRepository;
 	private final DailyStatsRepository statsRepository;
 	private final VisitorDailyStatsRepository visitorStatsRepository;
 	private final UserAchievementRepository achievementRepository;
+	private final Path mediaDir;
 
 	public SocialService(
 			GuestMessageRepository messageRepository,
 			DailyStatsRepository statsRepository,
 			VisitorDailyStatsRepository visitorStatsRepository,
-			UserAchievementRepository achievementRepository) {
+			UserAchievementRepository achievementRepository,
+			@Value("${blog.upload.dir:./data/uploads}") String uploadDir) {
 		this.messageRepository = messageRepository;
 		this.statsRepository = statsRepository;
 		this.visitorStatsRepository = visitorStatsRepository;
 		this.achievementRepository = achievementRepository;
+		this.mediaDir = Paths.get(uploadDir).toAbsolutePath().normalize().resolve("social");
 	}
 
 	@Transactional(readOnly = true)
@@ -46,15 +64,17 @@ public class SocialService {
 	}
 
 	@Transactional
-	public MessageResult postMessage(String nickname, String content) {
+	public MessageResult postMessage(String nickname, String content, String imageUrl, String voiceUrl) {
 		String safeNick = requireNickname(nickname);
 		String safeContent = sanitize(content, 40);
-		if (safeContent.isBlank()) {
+		boolean hasMedia = (imageUrl != null && !imageUrl.isBlank()) || (voiceUrl != null && !voiceUrl.isBlank());
+		if (safeContent.isBlank() && !hasMedia) {
 			throw new IllegalArgumentException("内容不能为空");
 		}
 
 		String color = COLORS.get(ThreadLocalRandom.current().nextInt(COLORS.size()));
-		GuestMessage message = messageRepository.save(new GuestMessage(safeNick, safeContent, color));
+		GuestMessage message = messageRepository.save(new GuestMessage(
+				safeNick, safeContent, color, sanitizeUrl(imageUrl), sanitizeUrl(voiceUrl)));
 
 		VisitorDailyStats visitor = getVisitorStats(safeNick);
 		visitor.incrementMessage();
@@ -196,14 +216,75 @@ public class SocialService {
 		return cleaned.length() > maxLen ? cleaned.substring(0, maxLen) : cleaned;
 	}
 
-	public record MessageDto(Long id, String nickname, String content, String color, String createdAt) {
+	private String sanitizeUrl(String url) {
+		String cleaned = sanitize(url, 255);
+		if (cleaned.isBlank()) {
+			return null;
+		}
+		if (!cleaned.startsWith("/uploads/social/")) {
+			throw new IllegalArgumentException("非法的媒体地址");
+		}
+		return cleaned;
+	}
+
+	@Transactional
+	public String storeMedia(MultipartFile file, String kind) {
+		if (file == null || file.isEmpty()) {
+			throw new IllegalArgumentException("文件不能为空");
+		}
+		boolean voice = "voice".equalsIgnoreCase(kind);
+		String contentType = file.getContentType() != null ? file.getContentType().toLowerCase(Locale.ROOT) : "";
+		long maxBytes = voice ? MAX_VOICE_BYTES : MAX_IMAGE_BYTES;
+		Set<String> allowed = voice ? VOICE_TYPES : IMAGE_TYPES;
+
+		if (!allowed.contains(contentType)) {
+			throw new IllegalArgumentException(voice ? "不支持的语音格式" : "不支持的图片格式");
+		}
+		if (file.getSize() > maxBytes) {
+			throw new IllegalArgumentException(voice ? "语音不能超过 2MB" : "图片不能超过 5MB");
+		}
+
+		String ext = switch (contentType) {
+			case "image/jpeg" -> ".jpg";
+			case "image/png" -> ".png";
+			case "image/gif" -> ".gif";
+			case "image/webp" -> ".webp";
+			case "audio/webm" -> ".webm";
+			case "audio/ogg" -> ".ogg";
+			case "audio/mpeg" -> ".mp3";
+			case "audio/mp4", "audio/x-m4a" -> ".m4a";
+			case "audio/wav" -> ".wav";
+			default -> "";
+		};
+
+		try {
+			Files.createDirectories(mediaDir);
+			String storedName = UUID.randomUUID().toString().replace("-", "") + ext;
+			Path target = mediaDir.resolve(storedName).normalize();
+			if (!target.startsWith(mediaDir)) {
+				throw new IllegalArgumentException("无效的文件名");
+			}
+			try (var in = file.getInputStream()) {
+				Files.copy(in, target, StandardCopyOption.REPLACE_EXISTING);
+			}
+			return "/uploads/social/" + storedName;
+		}
+		catch (java.io.IOException ex) {
+			throw new IllegalStateException("媒体文件保存失败", ex);
+		}
+	}
+
+	public record MessageDto(Long id, String nickname, String content, String color, String createdAt,
+			String imageUrl, String voiceUrl) {
 		public static MessageDto from(GuestMessage m) {
 			return new MessageDto(
 					m.getId(),
 					m.getNickname(),
 					m.getContent(),
 					m.getColor(),
-					m.getCreatedAt().toString());
+					m.getCreatedAt().toString(),
+					m.getImageUrl(),
+					m.getVoiceUrl());
 		}
 	}
 

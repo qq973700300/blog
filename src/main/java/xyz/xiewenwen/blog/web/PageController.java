@@ -16,6 +16,11 @@ public class PageController {
 		return "forward:/article.html";
 	}
 
+	@GetMapping("/resume")
+	public String resume() {
+		return "forward:/resume.html";
+	}
+
 	@GetMapping("/admin")
 	public String admin() {
 		return "forward:/admin.html";

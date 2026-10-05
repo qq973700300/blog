@@ -26,6 +26,12 @@ public class GuestMessage {
 	@Column(nullable = false, length = 16)
 	private String color;
 
+	@Column(nullable = true, length = 255)
+	private String imageUrl;
+
+	@Column(nullable = true, length = 255)
+	private String voiceUrl;
+
 	@Column(nullable = false)
 	private LocalDateTime createdAt;
 
@@ -33,9 +39,15 @@ public class GuestMessage {
 	}
 
 	public GuestMessage(String nickname, String content, String color) {
+		this(nickname, content, color, null, null);
+	}
+
+	public GuestMessage(String nickname, String content, String color, String imageUrl, String voiceUrl) {
 		this.nickname = nickname;
 		this.content = content;
 		this.color = color;
+		this.imageUrl = imageUrl;
+		this.voiceUrl = voiceUrl;
 		this.createdAt = LocalDateTime.now();
 	}
 
@@ -53,6 +65,14 @@ public class GuestMessage {
 
 	public String getColor() {
 		return color;
+	}
+
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public String getVoiceUrl() {
+		return voiceUrl;
 	}
 
 	public LocalDateTime getCreatedAt() {

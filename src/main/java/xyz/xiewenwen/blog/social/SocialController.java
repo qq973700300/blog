@@ -35,10 +35,29 @@ public class SocialController {
 	@PostMapping("/messages")
 	public SocialService.MessageResult postMessage(@RequestBody Map<String, String> body) {
 		try {
-			return socialService.postMessage(body.get("nickname"), body.get("content"));
+			return socialService.postMessage(
+					body.get("nickname"),
+					body.get("content"),
+					body.get("imageUrl"),
+					body.get("voiceUrl"));
 		}
 		catch (IllegalArgumentException ex) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+		}
+	}
+
+	@PostMapping("/upload")
+	public Map<String, String> uploadMedia(
+			@RequestParam("file") org.springframework.web.multipart.MultipartFile file,
+			@RequestParam("kind") String kind) {
+		try {
+			return Map.of("url", socialService.storeMedia(file, kind));
+		}
+		catch (IllegalArgumentException ex) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+		}
+		catch (IllegalStateException ex) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
 		}
 	}
 

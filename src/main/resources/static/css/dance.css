@@ -17,10 +17,77 @@
 html, body {
   width: 100%;
   height: 100%;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   background: var(--bg);
   font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", Consolas, monospace;
   color: #e0e6f0;
+}
+
+/* 两屏布局：第一屏舞台 / 第二屏 下载+博客+留言板 */
+.screen-stage {
+  position: relative;
+  height: 100vh;
+}
+
+.screen-hub {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1.2rem 5rem;
+  z-index: 2;
+}
+
+.hub-card {
+  width: min(94vw, 1100px);
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.hub-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.7rem;
+}
+
+.hub-blog-btn {
+  margin-top: 0;
+  display: inline-flex;
+  align-items: center;
+}
+
+.hub-actions .download-btn {
+  display: inline-flex;
+  align-items: center;
+}
+
+.scroll-down {
+  position: absolute;
+  bottom: 0.7rem;
+  right: 1.4rem;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: var(--text-dim);
+  font-size: 0.68rem;
+  letter-spacing: 0.15em;
+  transition: color 0.25s;
+  animation: hint-pulse 2s ease-in-out infinite;
+}
+
+.scroll-down:hover {
+  color: var(--neon-cyan);
+}
+
+.scroll-down-arrow {
+  font-size: 1.1rem;
+  line-height: 1;
 }
 
 /* 启动前隐藏主界面 */
@@ -28,6 +95,8 @@ body.booting .stage,
 body.booting .music-controls,
 body.booting .enter-hint,
 body.booting .beat-bar,
+body.booting .screen-hub,
+body.booting .scroll-down,
 body.booting #code-rain {
   opacity: 0;
   pointer-events: none;
@@ -37,6 +106,8 @@ body.boot-done .stage,
 body.boot-done .music-controls,
 body.boot-done .enter-hint,
 body.boot-done .beat-bar,
+body.boot-done .screen-hub,
+body.boot-done .scroll-down,
 body.boot-done #code-rain {
   opacity: 1;
   transition: opacity 0.8s ease 0.15s;
@@ -539,6 +610,14 @@ body.booting .bug-hunt-hud {
   transform: scale(1.04);
 }
 
+/* 首页简历入口：与博客按钮同款，粉色霓虹变体 */
+.resume-btn {
+  margin-left: 0.6rem;
+  border-color: rgba(255, 45, 149, 0.4);
+  color: var(--neon-pink);
+  background: rgba(255, 45, 149, 0.08);
+}
+
 /* 跳舞的代码块容器 */
 .dancers {
   position: relative;
@@ -651,7 +730,7 @@ body.booting .bug-hunt-hud {
 
 /* 节拍指示器 */
 .beat-bar {
-  position: fixed;
+  position: absolute;
   bottom: 2.4rem;
   left: 50%;
   transform: translateX(-50%);
@@ -677,7 +756,7 @@ body.booting .bug-hunt-hud {
 
 /* 音乐控制 */
 .music-controls {
-  position: fixed;
+  position: absolute;
   bottom: 5.5rem;
   left: 50%;
   transform: translateX(-50%);
@@ -838,7 +917,7 @@ body.on-beat .paper-person {
 
 /* 进入提示 */
 .enter-hint {
-  position: fixed;
+  position: absolute;
   bottom: 8.5rem;
   z-index: 3;
   font-size: 0.75rem;
@@ -1052,6 +1131,11 @@ body.on-beat .dancer {
   .enter-blog-btn {
     font-size: 0.75rem;
     padding: 0.5rem 1rem;
+  }
+
+  .resume-btn {
+    margin-left: 0;
+    margin-top: 0.6rem;
   }
 
   .dancers {
