@@ -12,7 +12,7 @@ STARTING_BLOCK = """
     location @starting {
         default_type text/html;
         charset utf-8;
-        return 503 '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta http-equiv="refresh" content="2"><meta name="viewport" content="width=device-width,initial-scale=1"><title>启动中</title></head><body style="margin:0;background:#0a0e17;color:#00f5ff;font-family:system-ui,sans-serif;text-align:center;padding:18vh 16px"><h1 style="font-weight:600">代码跳舞博客启动中…</h1><p style="color:#8899aa">Spring Boot 正在暖机，约 2 秒后自动刷新</p></body></html>';
+                return 503 '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta http-equiv="refresh" content="2"><meta name="viewport" content="width=device-width,initial-scale=1"><title>xiewenwen.xyz</title><style>body{margin:0;background:#0a0e17;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:22px;font-family:"JetBrains Mono",Consolas,monospace}.d{width:8px;height:8px;border-radius:50%;background:#00f5ff;animation:p 1.2s infinite}.d2{animation-delay:.2s}.d3{animation-delay:.4s}@keyframes p{0%,80%,100%{opacity:.15;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}p{margin:0;color:#5a6b80;font-size:12px;letter-spacing:.35em}</style></head><body><div style="display:flex;gap:12px"><span class="d"></span><span class="d d2"></span><span class="d d3"></span></div><p>RECONNECTING</p></body></html>';
     }
 """
 
