@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="docx-page-size" content="A4">
 <title>谢文文 - Android 开发工程师</title>
 <style>
@@ -68,6 +69,23 @@
   .call-btn-wrap { display: flex; flex-direction: column; align-items: center; }
 
   @media print { .call-overlay { display: none !important; } }
+
+  /* ===== 手机端适配 ===== */
+  @media (max-width: 600px) {
+    body { padding: 0 12px; box-sizing: border-box; }
+    h1 { font-size: 17pt !important; }
+    h2 { font-size: 12.5pt !important; }
+    h3 { font-size: 11.5pt !important; }
+    body > ul, body > p, body > ul > li { font-size: 10.5pt !important; }
+
+    .call-overlay { padding: 11vh 0 7vh; }
+    .call-avatar { width: 84px; height: 84px; }
+    .call-name { font-size: 20px; margin-top: 18px; }
+    .call-status { font-size: 12px; text-align: center; padding: 0 20px; }
+    .call-actions { gap: 15vw; }
+    .call-btn { width: 62px; height: 62px; }
+    .call-btn svg { width: 25px; height: 25px; }
+  }
 </style>
 </head>
 <body>
@@ -164,11 +182,15 @@
   ring.preload = 'auto';
 
   var vibrateTimer = null;
-  var ringStarted = false;
+  var playing = false;      // 铃声是否真的在响
+  var kickArmed = false;
   var hint = document.getElementById('call-hint');
+  var statusEl = document.querySelector('.call-status');
+  var acceptBtn = document.getElementById('call-accept');
+  var acceptLabel = acceptBtn ? acceptBtn.parentElement.querySelector('.call-btn-label') : null;
 
   function startVibrate() {
-    if (!navigator.vibrate) return;
+    if (!navigator.vibrate || vibrateTimer) return;
     vibrateTimer = setInterval(function () {
       navigator.vibrate([400, 300, 400, 300]);
     }, 1600);
@@ -179,30 +201,34 @@
     if (navigator.vibrate) { try { navigator.vibrate(0); } catch (e) {} }
   }
 
-  function startRing() {
-    if (ringStarted) return;
-    ringStarted = true;
+  function doPlay() {
     var p = ring.play();
-    if (p && p.catch) {
-      p.catch(function () {
-        // 浏览器拦截自动播放：等用户第一次触碰页面再响铃
-        if (hint) hint.style.display = 'block';
-        var kick = function () {
-          document.removeEventListener('pointerdown', kick);
-          document.removeEventListener('keydown', kick);
-          if (hint) hint.style.display = 'none';
-          ringStarted = false;
-          startRing();
-        };
-        document.addEventListener('pointerdown', kick);
-        document.addEventListener('keydown', kick);
-      });
+    if (p && p.then) {
+      p.then(function () { playing = true; }).catch(function () { armKick(); });
+    } else {
+      playing = true;
     }
-    startVibrate();
+  }
+
+  // 浏览器拦截自动播放时：等用户第一次触碰页面再响铃
+  function armKick() {
+    if (kickArmed) return;
+    kickArmed = true;
+    var kick = function () {
+      document.removeEventListener('pointerdown', kick);
+      document.removeEventListener('keydown', kick);
+      kickArmed = false;
+      if (hint) hint.style.display = 'none';
+      doPlay();
+      startVibrate();
+    };
+    document.addEventListener('pointerdown', kick);
+    document.addEventListener('keydown', kick);
   }
 
   function stopRing() {
     try { ring.pause(); ring.currentTime = 0; } catch (e) {}
+    playing = false;
     stopVibrate();
   }
 
@@ -213,7 +239,21 @@
     setTimeout(function () { overlay.remove(); }, 500);
   }
 
-  document.getElementById('call-accept').addEventListener('click', hideOverlay);
+  // 两段式接听：铃声没响时第一下先响铃，响了之后再点才进入
+  if (acceptBtn) {
+    acceptBtn.addEventListener('click', function () {
+      if (!playing) {
+        doPlay();
+        startVibrate();
+        if (hint) hint.style.display = 'none';
+        if (statusEl) statusEl.textContent = '已接通 · 铃声播放中';
+        if (acceptLabel) acceptLabel.textContent = '进入简历';
+        return;
+      }
+      hideOverlay();
+    });
+  }
+
   document.getElementById('call-decline').addEventListener('click', function () {
     stopRing();
     location.href = '/';
@@ -221,7 +261,8 @@
 
   // 响铃期间锁定页面滚动
   document.body.style.overflow = 'hidden';
-  startRing();
+  doPlay();
+  startVibrate();
 })();
 </script>
 
