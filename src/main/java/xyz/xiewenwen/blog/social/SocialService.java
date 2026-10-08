@@ -35,18 +35,21 @@ public class SocialService {
 	private final VisitorDailyStatsRepository visitorStatsRepository;
 	private final UserAchievementRepository achievementRepository;
 	private final Path mediaDir;
+	private final String ffmpegBin;
 
 	public SocialService(
 			GuestMessageRepository messageRepository,
 			DailyStatsRepository statsRepository,
 			VisitorDailyStatsRepository visitorStatsRepository,
 			UserAchievementRepository achievementRepository,
-			@Value("${blog.upload.dir:./data/uploads}") String uploadDir) {
+			@Value("${blog.upload.dir:./data/uploads}") String uploadDir,
+			@Value("${blog.ffmpeg.bin:ffmpeg}") String ffmpegBin) {
 		this.messageRepository = messageRepository;
 		this.statsRepository = statsRepository;
 		this.visitorStatsRepository = visitorStatsRepository;
 		this.achievementRepository = achievementRepository;
 		this.mediaDir = Paths.get(uploadDir).toAbsolutePath().normalize().resolve("social");
+		this.ffmpegBin = ffmpegBin;
 	}
 
 	@Transactional(readOnly = true)
@@ -234,6 +237,11 @@ public class SocialService {
 		}
 		boolean voice = "voice".equalsIgnoreCase(kind);
 		String contentType = file.getContentType() != null ? file.getContentType().toLowerCase(Locale.ROOT) : "";
+		// MediaRecorder 等来源会带 ";codecs=xxx" 后缀（如 audio/webm;codecs=opus），归一化后再校验
+		int semi = contentType.indexOf(';');
+		if (semi >= 0) {
+			contentType = contentType.substring(0, semi).trim();
+		}
 		long maxBytes = voice ? MAX_VOICE_BYTES : MAX_IMAGE_BYTES;
 		Set<String> allowed = voice ? VOICE_TYPES : IMAGE_TYPES;
 
@@ -244,13 +252,17 @@ public class SocialService {
 			throw new IllegalArgumentException(voice ? "语音不能超过 2MB" : "图片不能超过 5MB");
 		}
 
+		// webm/ogg 录音在 iOS Safari 等环境无法播放，统一转码为 mp3
+		boolean transcodeToMp3 = voice && (contentType.equals("audio/webm") || contentType.equals("audio/ogg"));
+		if (transcodeToMp3) {
+			return storeTranscodedVoice(file);
+		}
+
 		String ext = switch (contentType) {
 			case "image/jpeg" -> ".jpg";
 			case "image/png" -> ".png";
 			case "image/gif" -> ".gif";
 			case "image/webp" -> ".webp";
-			case "audio/webm" -> ".webm";
-			case "audio/ogg" -> ".ogg";
 			case "audio/mpeg" -> ".mp3";
 			case "audio/mp4", "audio/x-m4a" -> ".m4a";
 			case "audio/wav" -> ".wav";
@@ -272,6 +284,66 @@ public class SocialService {
 		catch (java.io.IOException ex) {
 			throw new IllegalStateException("媒体文件保存失败", ex);
 		}
+	}
+
+	/** 将 webm/ogg 录音用 ffmpeg 转成 mp3（全端可播）；失败时退回保存原始文件。 */
+	private String storeTranscodedVoice(MultipartFile file) {
+		Path temp = null;
+		try {
+			Files.createDirectories(mediaDir);
+			temp = Files.createTempFile("voice-", "-in");
+			try (var in = file.getInputStream()) {
+				Files.copy(in, temp, StandardCopyOption.REPLACE_EXISTING);
+			}
+			String storedName = UUID.randomUUID().toString().replace("-", "") + ".mp3";
+			Path target = mediaDir.resolve(storedName).normalize();
+			if (!target.startsWith(mediaDir)) {
+				throw new IllegalArgumentException("无效的文件名");
+			}
+			Process proc = new ProcessBuilder(
+					ffmpegBin, "-y", "-i", temp.toString(),
+					"-codec:a", "libmp3lame", "-b:a", "64k", "-ac", "1",
+					target.toString())
+					.redirectError(ProcessBuilder.Redirect.DISCARD)
+					.redirectOutput(ProcessBuilder.Redirect.DISCARD)
+					.start();
+			boolean done = proc.waitFor(20, java.util.concurrent.TimeUnit.SECONDS);
+			if (!done) {
+				proc.destroyForcibly();
+			}
+			if (done && proc.exitValue() == 0 && Files.exists(target) && Files.size(target) > 0) {
+				return "/uploads/social/" + storedName;
+			}
+			// 转码失败：退回保存原始 webm
+			return saveToMedia(temp, ".webm");
+		}
+		catch (InterruptedException ex) {
+			Thread.currentThread().interrupt();
+			throw new IllegalStateException("语音转码被中断", ex);
+		}
+		catch (java.io.IOException ex) {
+			throw new IllegalStateException("语音处理失败", ex);
+		}
+		finally {
+			if (temp != null) {
+				try {
+					Files.deleteIfExists(temp);
+				}
+				catch (java.io.IOException ignored) {
+					// 清理临时文件失败可忽略
+				}
+			}
+		}
+	}
+
+	private String saveToMedia(Path source, String ext) throws java.io.IOException {
+		String storedName = UUID.randomUUID().toString().replace("-", "") + ext;
+		Path target = mediaDir.resolve(storedName).normalize();
+		if (!target.startsWith(mediaDir)) {
+			throw new IllegalArgumentException("无效的文件名");
+		}
+		Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+		return "/uploads/social/" + storedName;
 	}
 
 	public record MessageDto(Long id, String nickname, String content, String color, String createdAt,

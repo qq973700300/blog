@@ -225,7 +225,9 @@
           voiceStatus.textContent = '';
           stream.getTracks().forEach((t) => t.stop());
           if (voiceBusy) return;
-          const blob = new Blob(chunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+          // mime 归一化：去掉 ";codecs=xxx" 后缀，后端只认主类型
+          const rawMime = mediaRecorder.mimeType || 'audio/webm';
+          const blob = new Blob(chunks, { type: rawMime.split(';')[0] });
           if (blob.size > 2 * 1024 * 1024) {
             showToast('语音太长，请控制在 2MB 内');
             return;
