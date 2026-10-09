@@ -147,5 +147,5 @@ import * as THREE from '/js/vendor/three.module.js';
     renderer.render(scene, camera);
   }
 
-  frame();
+  renderer.setAnimationLoop(frame); // 注册渲染循环（之前只调用一次 frame() 导致只有一帧静态画面）
 })();
