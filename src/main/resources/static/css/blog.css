@@ -11,7 +11,28 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-html, body {
+/* three.js 霓虹隧道背景（tunnel-bg.js 渲染） */
+#tunnel-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: #05080f; /* canvas 就绪前的兜底色 */
+}
+#tunnel-bg canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+#tunnel-bg::after {
+  /* 压暗层：正文可读性优先，隧道透出氛围光 */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 12, 20, 0.72);
+}
+
+html {
   min-height: 100%;
   background-color: var(--bg);
   background-image:
@@ -21,6 +42,11 @@ html, body {
   background-position: center center;
   background-attachment: fixed;
   background-repeat: no-repeat;
+}
+
+body {
+  min-height: 100%;
+  background: transparent; /* 背景全在 html 上，隧道(z-index:-1)才能透出来 */
   color: #e0e6f0;
   font-family: "JetBrains Mono", "Fira Code", Consolas, monospace;
 }

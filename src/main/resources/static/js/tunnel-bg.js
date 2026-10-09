@@ -1,8 +1,8 @@
-/* 开机屏背景：Neon Tunnel（three.js shader 隧道）
-   来源：followtheway/tunnel-demo.html，适配为博客开机背景：
-   - 不注册键盘/鼠标交互（避免与开机彩蛋冲突）
-   - 监听 blog:ready（boot.js 进站事件）→ 淡出并销毁 WebGL 资源
-   - 开机动画被跳过时完全不渲染 */
+/* 博客页（/blog）常驻背景：Neon Tunnel（three.js shader 隧道）
+   来源：followtheway/tunnel-demo.html
+   - fixed 全屏置于内容之后（z-index:-1），上方覆盖压暗层保证文字可读
+   - 切到后台标签页自动暂停渲染，回来继续（省电）
+   - WebGL 不可用时安静降级（保持原背景图） */
 import * as THREE from '/js/vendor/three.module.js';
 
 (function initTunnelBg() {
@@ -10,14 +10,13 @@ import * as THREE from '/js/vendor/three.module.js';
 
   const holder = document.getElementById('tunnel-bg');
   if (!holder) return;
-  if (document.body.classList.contains('boot-done')) return;
 
   /* ---------- 基础 ---------- */
   let renderer;
   try {
     renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'low-power' });
   } catch (err) {
-    return; // WebGL 不可用：开机屏保持原样
+    return; // WebGL 不可用：保持原背景
   }
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -40,7 +39,7 @@ import * as THREE from '/js/vendor/three.module.js';
   const CURVE = { kx: 0.0, ky: 0.00085 };
   function curveY(d) { return CURVE.ky * d * d; }
 
-  const MODE = 4; // 极光波纹（固定，不响应键盘）
+  const MODE = 4; // 极光波纹
 
   const mobile = window.innerWidth < 700;
   const tunnelGeo = new THREE.CylinderGeometry(TUNNEL_R, TUNNEL_R, TUNNEL_LEN, mobile ? 64 : 96, mobile ? 160 : 320, true);
@@ -116,39 +115,26 @@ import * as THREE from '/js/vendor/three.module.js';
   const tunnel = new THREE.Mesh(tunnelGeo, tunnelMat);
   scene.add(tunnel);
 
-  /* ---------- 主循环 ---------- */
+  /* ---------- 主循环（切后台暂停，回前台恢复） ---------- */
   const clock = new THREE.Clock();
   let travel = 0;
-  let disposed = false;
 
-  function tearDown() {
-    if (disposed) return;
-    disposed = true;
-    renderer.setAnimationLoop(null);
-    tunnelGeo.dispose();
-    tunnelMat.dispose();
-    renderer.dispose();
-    if (renderer.domElement.parentNode) {
-      renderer.domElement.parentNode.removeChild(renderer.domElement);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      renderer.setAnimationLoop(null);
+    } else {
+      clock.getDelta(); // 清掉暂停期间累积的 delta，避免跳帧
+      renderer.setAnimationLoop(frame);
     }
-    holder.classList.add('hide');
-  }
+  });
 
-  document.addEventListener('blog:ready', tearDown, { once: true });
   window.addEventListener('resize', () => {
-    if (disposed) return;
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
 
-  renderer.setAnimationLoop(() => {
-    if (disposed) return;
-    // 兜底：boot.js 因 sessionStorage 直接跳过开机时也会给 body 加 boot-done
-    if (document.body.classList.contains('boot-done')) { tearDown(); return; }
-
-    if (!holder.classList.contains('on')) holder.classList.add('on'); // 首帧后淡入
-
+  function frame() {
     const dt = Math.min(clock.getDelta(), 0.05);
     travel = (travel + SPEED * dt) % LOOP;
     tunnelUniforms.uTravel.value = travel;
@@ -159,5 +145,7 @@ import * as THREE from '/js/vendor/three.module.js';
     camera.rotateX(0.08);
 
     renderer.render(scene, camera);
-  });
+  }
+
+  frame();
 })();
