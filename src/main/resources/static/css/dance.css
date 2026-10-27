@@ -584,12 +584,11 @@ body.booting .bug-hunt-hud {
   margin-bottom: 0;
 }
 
-/* 中部两入口按钮（与纸片人同行） */
+/* 中部两入口按钮 */
 .stage-links {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  padding-bottom: 0.35rem;
 }
 
 .stage-links .enter-blog-btn {
