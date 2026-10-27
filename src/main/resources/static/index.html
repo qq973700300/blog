@@ -181,7 +181,10 @@
   <script>
     (function () {
       var c = document.getElementById('boot-clock');
-      if (c && window.ReverseClock) window.ReverseClock.init(c, 150);
+      if (c && window.ReverseClock) {
+        var size = Math.min(window.innerWidth * 0.72, window.innerHeight * 0.6, 400);
+        window.ReverseClock.init(c, size);
+      }
     })();
   </script>
   <script src="/js/dancers.js?v=9"></script>
