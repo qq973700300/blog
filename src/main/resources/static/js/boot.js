@@ -9,7 +9,7 @@
   const screen = document.getElementById('boot-screen');
   const output = document.getElementById('boot-output');
   const cursor = document.querySelector('.boot-cursor');
-  if (!screen || !output) return;
+  if (!screen) return;
 
   let lineIndex = 0;
   let charIndex = 0;
@@ -33,12 +33,12 @@
 
   let autoEnterTimer = null;
 
-  function scheduleAutoEnter() {
+  function scheduleAutoEnter(delay) {
     autoEnterTimer = setTimeout(() => {
       if (!document.body.classList.contains('boot-done')) {
         enterSite();
       }
-    }, 1200);
+    }, delay || 1200);
   }
 
   function typeNextChar() {
@@ -56,7 +56,7 @@
       typingTimer = setTimeout(startLine, currentLine.pause);
     } else {
       finished = true;
-      cursor.classList.add('blink');
+      if (cursor) cursor.classList.add('blink');
       scheduleAutoEnter();
     }
   }
@@ -80,7 +80,10 @@
 
   if (sessionStorage.getItem('blog_boot_done')) {
     enterSite();
-  } else {
+  } else if (output) {
     startLine();
+  } else {
+    /* 极简模式：加载页只显示反方向钟，展示片刻后自动进站 */
+    scheduleAutoEnter(2500);
   }
 })();
