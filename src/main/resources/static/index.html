@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/dance.css?v=18">
+  <link rel="stylesheet" href="/css/dance.css?v=19">
   <link rel="stylesheet" href="/css/social.css?v=12">
   <script>window.__BLOG_MEDIA_V='20250617-birds-v1';window.__BLOG_APP_V='1';</script>
 </head>
@@ -22,8 +22,10 @@
   <div id="screen-stage" class="screen screen-stage">
     <div class="stage">
       <div class="title-block">
-        <a href="/blog" class="enter-blog-btn">进入博客 →</a>
-        <a href="/resume" class="enter-blog-btn resume-btn">📄 我的简历</a>
+        <button id="play-btn" class="play-btn" type="button" aria-label="播放视频">
+          <span class="play-icon">▶</span>
+          <span class="play-label">播放</span>
+        </button>
       </div>
     </div>
 
@@ -59,10 +61,10 @@
         </div>
       </div>
 
-      <button id="play-btn" class="play-btn" type="button" aria-label="播放视频">
-        <span class="play-icon">▶</span>
-        <span class="play-label">播放</span>
-      </button>
+      <div class="stage-links">
+        <a href="/blog" class="enter-blog-btn">进入博客 →</a>
+        <a href="/resume" class="enter-blog-btn resume-btn">📄 我的简历</a>
+      </div>
 
       <div class="paper-dancers paper-right" aria-hidden="true">
         <div class="paper-person pp-3">
