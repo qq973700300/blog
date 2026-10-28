@@ -305,7 +305,7 @@ body.shake-party {
 }
 
 body.ascii-video-active #code-rain {
-  opacity: 0.95;
+  opacity: 1;
 }
 
 /* 播放对比滑块：左边解析画面 / 右边原视频；手柄常驻，拖动即播放 */

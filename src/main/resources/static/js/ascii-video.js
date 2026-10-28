@@ -67,6 +67,8 @@
       this.video = document.getElementById('ascii-video-source');
       this.sample = document.createElement('canvas');
       this.sampleCtx = this.sample.getContext('2d', { willReadFrequently: true });
+      this.glow = document.createElement('canvas');
+      this.glowCtx = this.glow.getContext('2d');
       this.procedural = new ProceduralSource();
       this.useProcedural = true;
       this.running = false;
@@ -183,7 +185,7 @@
     }
 
     _boost(v) {
-      return Math.min(255, Math.floor(v * 1.15 + 18));
+      return Math.min(255, Math.floor(v * 1.3 + 22));
     }
 
     _charForLum(lum) {
@@ -210,6 +212,8 @@
 
       this.sample.width = cols;
       this.sample.height = rows;
+      this.glow.width = cols;
+      this.glow.height = rows;
 
       if (!source) source = this._drawSource(dt);
       try {
@@ -224,6 +228,19 @@
 
       targetCtx.fillStyle = '#0a0e17';
       targetCtx.fillRect(0, 0, w, h);
+
+      /* 字符底铺一层低亮度色彩（按每格像素颜色），解决字符覆盖率低导致画面偏黑 */
+      const glowImg = this.glowCtx.createImageData(cols, rows);
+      for (let p = 0; p < cols * rows; p++) {
+        const i = p * 4;
+        glowImg.data[i] = Math.min(255, data[i] * 0.42 + 8);
+        glowImg.data[i + 1] = Math.min(255, data[i + 1] * 0.42 + 8);
+        glowImg.data[i + 2] = Math.min(255, data[i + 2] * 0.42 + 8);
+        glowImg.data[i + 3] = 255;
+      }
+      this.glowCtx.putImageData(glowImg, 0, 0);
+      targetCtx.drawImage(this.glow, 0, 0, w, h);
+
       targetCtx.font = `${this.cellH}px "JetBrains Mono", monospace`;
       targetCtx.textBaseline = 'top';
 
