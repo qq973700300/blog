@@ -403,6 +403,17 @@ body.ascii-video-active .compare-tag {
   border-color: rgba(255, 255, 255, 0.2);
 }
 
+/* .stage 铺满首屏且 z-index 高于对比滑块，会让竖线拖不动；
+   改为不拦截指针事件，仅按钮本身可点 */
+.screen-stage .stage {
+  pointer-events: none;
+}
+
+.screen-stage .stage .play-btn,
+.screen-stage .stage .stage-links .enter-blog-btn {
+  pointer-events: auto;
+}
+
 .ascii-video-source {
   position: fixed;
   width: 1px;
