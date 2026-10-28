@@ -99,6 +99,10 @@
       if (!handle) return;
 
       let dragging = false;
+      let downX = null;
+      let moved = false;
+      let downWasPlaying = false;
+
       const setPos = (clientX) => {
         this.comparePos = Math.min(0.92, Math.max(0.08, clientX / window.innerWidth));
         this._applyComparePos();
@@ -106,15 +110,34 @@
 
       handle.addEventListener('pointerdown', (e) => {
         dragging = true;
+        moved = false;
+        downX = e.clientX;
+        downWasPlaying = !!(window.BlogPlayback && window.BlogPlayback.isPlaying());
+        /* 未播放时抓住滑块即开始播放 */
+        if (!downWasPlaying && window.BlogPlayback) window.BlogPlayback.play();
         try { handle.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
         e.preventDefault();
       });
+
       handle.addEventListener('pointermove', (e) => {
-        if (dragging) setPos(e.clientX);
+        if (!dragging) return;
+        if (downX !== null && Math.abs(e.clientX - downX) > 4) moved = true;
+        setPos(e.clientX);
       });
-      const stop = () => { dragging = false; };
+
+      const stop = () => {
+        /* 播放中且没有拖动 = 点击滑块，暂停/继续 */
+        if (dragging && downWasPlaying && !moved && window.BlogPlayback) {
+          window.BlogPlayback.toggle();
+        }
+        dragging = false;
+        downX = null;
+      };
       handle.addEventListener('pointerup', stop);
-      handle.addEventListener('pointercancel', stop);
+      handle.addEventListener('pointercancel', () => {
+        dragging = false;
+        downX = null;
+      });
 
       this._applyComparePos();
     }

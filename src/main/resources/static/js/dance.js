@@ -99,8 +99,10 @@
     beatIndex++;
 
     if (beatIndex % 4 === 1) {
-      stage.classList.add('beat-hit');
-      setTimeout(() => stage.classList.remove('beat-hit'), 80);
+      if (stage) {
+        stage.classList.add('beat-hit');
+        setTimeout(() => stage.classList.remove('beat-hit'), 80);
+      }
     }
 
     document.body.classList.toggle('on-beat', true);
@@ -167,10 +169,12 @@
   function setPlayingUI() {
     isPlaying = true;
     musicControls.classList.add('playing');
-    playBtn.classList.add('playing');
-    playBtn.querySelector('.play-icon').textContent = '⏸';
-    playBtn.querySelector('.play-label').textContent = '暂停';
-    hint.textContent = '♪ 视频原声';
+    if (playBtn) {
+      playBtn.classList.add('playing');
+      playBtn.querySelector('.play-icon').textContent = '⏸';
+      playBtn.querySelector('.play-label').textContent = '暂停';
+    }
+    hint.textContent = '♪ 视频原声 · 拖动滑块对比 · 点击滑块暂停';
     hint.style.opacity = '0.7';
     document.dispatchEvent(new CustomEvent('blog:music-playing', { detail: { playing: true } }));
   }
@@ -178,10 +182,12 @@
   function setStoppedUI() {
     isPlaying = false;
     musicControls.classList.remove('playing');
-    playBtn.classList.remove('playing');
-    playBtn.querySelector('.play-icon').textContent = '▶';
-    playBtn.querySelector('.play-label').textContent = '播放';
-    hint.textContent = '点击 ▶ 让代码跳起来 · 连按空格有彩蛋 · 点红色 bug 除虫';
+    if (playBtn) {
+      playBtn.classList.remove('playing');
+      playBtn.querySelector('.play-icon').textContent = '▶';
+      playBtn.querySelector('.play-label').textContent = '播放';
+    }
+    hint.textContent = '拖动中间滑块播放 · 点击滑块暂停/继续 · 连按空格有彩蛋 · 点红色 bug 除虫';
     hint.style.opacity = '1';
     document.dispatchEvent(new CustomEvent('blog:music-playing', { detail: { playing: false } }));
     startVisualBeat();
@@ -196,10 +202,19 @@
     }
   }
 
-  playBtn.addEventListener('pointerup', (e) => {
-    if (e.pointerType === 'mouse' && e.button !== 0) return;
-    toggleMusic();
-  });
+  if (playBtn) {
+    playBtn.addEventListener('pointerup', (e) => {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      toggleMusic();
+    });
+  }
+
+  /* 供滑块（ascii-video.js）远程控制播放 */
+  window.BlogPlayback = {
+    isPlaying: () => isPlaying,
+    play: () => { if (!isPlaying) tryStartPlayback(); },
+    toggle: () => toggleMusic(),
+  };
 
   document.addEventListener('blog:unlock-audio', () => music.unlockFromGesture());
 

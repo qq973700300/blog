@@ -308,18 +308,16 @@ body.ascii-video-active #code-rain {
   opacity: 0.95;
 }
 
-/* 播放对比滑块：左边解析画面 / 右边原视频 */
+/* 播放对比滑块：左边解析画面 / 右边原视频；手柄常驻，拖动即播放 */
 #video-compare {
   position: fixed;
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.6s ease;
 }
 
-body.ascii-video-active #video-compare {
-  opacity: 1;
+body.booting #video-compare {
+  visibility: hidden;
 }
 
 #compare-original {
@@ -327,6 +325,12 @@ body.ascii-video-active #video-compare {
   inset: 0;
   width: 100%;
   height: 100%;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+body.ascii-video-active #compare-original {
+  opacity: 1;
 }
 
 #compare-handle {
@@ -339,7 +343,7 @@ body.ascii-video-active #video-compare {
   pointer-events: auto;
   touch-action: none;
   cursor: ew-resize;
-  opacity: 0;
+  opacity: 0.55;
   transition: opacity 0.4s;
 }
 
@@ -401,17 +405,6 @@ body.ascii-video-active .compare-tag {
   right: 1rem;
   color: rgba(255, 255, 255, 0.75);
   border-color: rgba(255, 255, 255, 0.2);
-}
-
-/* .stage 铺满首屏且 z-index 高于对比滑块，会让竖线拖不动；
-   改为不拦截指针事件，仅按钮本身可点 */
-.screen-stage .stage {
-  pointer-events: none;
-}
-
-.screen-stage .stage .play-btn,
-.screen-stage .stage .stage-links .enter-blog-btn {
-  pointer-events: auto;
 }
 
 .ascii-video-source {
