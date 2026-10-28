@@ -155,40 +155,48 @@
         startVisualBeat();
         setPlayingUI();
       });
-      hint.textContent = '视频启动中...';
-      hint.style.opacity = '1';
+      if (hint) {
+        hint.textContent = '视频启动中...';
+        hint.style.opacity = '1';
+      }
       startVisualBeat();
       return;
     }
 
-    hint.textContent = '播放失败，请再点一次 ▶';
-    hint.style.opacity = '1';
+    if (hint) {
+      hint.textContent = '播放失败，请再点一次 ▶';
+      hint.style.opacity = '1';
+    }
     startVisualBeat();
   }
 
   function setPlayingUI() {
     isPlaying = true;
-    musicControls.classList.add('playing');
+    if (musicControls) musicControls.classList.add('playing');
     if (playBtn) {
       playBtn.classList.add('playing');
       playBtn.querySelector('.play-icon').textContent = '⏸';
       playBtn.querySelector('.play-label').textContent = '暂停';
     }
-    hint.textContent = '♪ 视频原声 · 拖动滑块对比 · 点击滑块暂停';
-    hint.style.opacity = '0.7';
+    if (hint) {
+      hint.textContent = '♪ 视频原声 · 拖动滑块对比 · 点击滑块暂停';
+      hint.style.opacity = '0.7';
+    }
     document.dispatchEvent(new CustomEvent('blog:music-playing', { detail: { playing: true } }));
   }
 
   function setStoppedUI() {
     isPlaying = false;
-    musicControls.classList.remove('playing');
+    if (musicControls) musicControls.classList.remove('playing');
     if (playBtn) {
       playBtn.classList.remove('playing');
       playBtn.querySelector('.play-icon').textContent = '▶';
       playBtn.querySelector('.play-label').textContent = '播放';
     }
-    hint.textContent = '拖动中间滑块播放 · 点击滑块暂停/继续 · 连按空格有彩蛋 · 点红色 bug 除虫';
-    hint.style.opacity = '1';
+    if (hint) {
+      hint.textContent = '拖动中间滑块播放 · 点击滑块暂停/继续';
+      hint.style.opacity = '1';
+    }
     document.dispatchEvent(new CustomEvent('blog:music-playing', { detail: { playing: false } }));
     startVisualBeat();
   }

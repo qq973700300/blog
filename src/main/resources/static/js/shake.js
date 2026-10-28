@@ -61,7 +61,7 @@
     lastTrigger = Date.now();
 
     document.body.classList.add('shake-party');
-    stage.classList.add('mega-bounce');
+    if (stage) stage.classList.add('mega-bounce');
     spawnParticles(18);
     showPenguin();
 
@@ -74,7 +74,7 @@
     }
 
     setTimeout(() => document.body.classList.remove('shake-party'), 500);
-    setTimeout(() => stage.classList.remove('mega-bounce'), 700);
+    if (stage) setTimeout(() => stage.classList.remove('mega-bounce'), 700);
   }
 
   document.addEventListener('keydown', (e) => {
