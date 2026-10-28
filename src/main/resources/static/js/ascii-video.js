@@ -77,9 +77,69 @@
       this.lumChars = CHARS_BY_LUM;
       this._warmedFor = null;
 
+      /* 播放对比滑块：左解析 / 右原视频 */
+      this.compareLayer = document.getElementById('video-compare');
+      this.compareCanvas = document.getElementById('compare-original');
+      this.compareCtx = this.compareCanvas ? this.compareCanvas.getContext('2d') : null;
+      this.compareHandle = document.getElementById('compare-handle');
+      this.comparePos = 0.5;
+
+      this._bindCompare();
       this._bindVideo();
       this._applyDensity();
       window.addEventListener('resize', () => this._applyDensity());
+    }
+
+    _bindCompare() {
+      if (!this.compareCtx) return;
+      this._resizeCompare();
+      window.addEventListener('resize', () => this._resizeCompare());
+
+      const handle = this.compareHandle;
+      if (!handle) return;
+
+      let dragging = false;
+      const setPos = (clientX) => {
+        this.comparePos = Math.min(0.92, Math.max(0.08, clientX / window.innerWidth));
+        this._applyComparePos();
+      };
+
+      handle.addEventListener('pointerdown', (e) => {
+        dragging = true;
+        try { handle.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+        e.preventDefault();
+      });
+      handle.addEventListener('pointermove', (e) => {
+        if (dragging) setPos(e.clientX);
+      });
+      const stop = () => { dragging = false; };
+      handle.addEventListener('pointerup', stop);
+      handle.addEventListener('pointercancel', stop);
+
+      this._applyComparePos();
+    }
+
+    _resizeCompare() {
+      if (!this.compareCanvas) return;
+      this.compareCanvas.width = window.innerWidth;
+      this.compareCanvas.height = window.innerHeight;
+      this._applyComparePos();
+    }
+
+    _applyComparePos() {
+      if (!this.compareCanvas) return;
+      const pct = (this.comparePos * 100).toFixed(2) + '%';
+      this.compareCanvas.style.clipPath = 'inset(0 0 0 ' + pct + ')';
+      if (this.compareHandle) this.compareHandle.style.left = pct;
+    }
+
+    _paintOriginal(source) {
+      if (!this.compareCtx) return;
+      const c = this.compareCanvas;
+      if (!c || c.width < 1 || c.height < 1) return;
+      try {
+        this.compareCtx.drawImage(source, 0, 0, c.width, c.height);
+      } catch (e) { /* ignore */ }
     }
 
     _applyDensity() {
@@ -121,14 +181,14 @@
       return this.video;
     }
 
-    _paintFrame(targetCtx, w, h, dt) {
+    _paintFrame(targetCtx, w, h, dt, source) {
       const cols = Math.max(1, Math.floor(w / this.cellW));
       const rows = Math.max(1, Math.floor(h / this.cellH));
 
       this.sample.width = cols;
       this.sample.height = rows;
 
-      const source = this._drawSource(dt);
+      if (!source) source = this._drawSource(dt);
       try {
         this.sampleCtx.drawImage(source, 0, 0, cols, rows);
       } catch (e) {
@@ -164,7 +224,13 @@
 
       const w = this.canvas.width;
       const h = this.canvas.height;
-      this._paintFrame(this.ctx, w, h, dt);
+
+      /* 每帧只取一次源画面，解析与原视频两侧共用，保证同步 */
+      const source = this._drawSource(dt);
+      this._paintFrame(this.ctx, w, h, dt, source);
+      if (this.compareCtx && this.comparePos < 0.995) {
+        this._paintOriginal(source);
+      }
 
       this.frameId = requestAnimationFrame((ts) => {
         const delta = this.lastProc ? (ts - this.lastProc) / 1000 : 0.016;

@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/dance.css?v=20">
+  <link rel="stylesheet" href="/css/dance.css?v=21">
   <link rel="stylesheet" href="/css/social.css?v=12">
   <script>window.__BLOG_MEDIA_V='20250617-birds-v1';window.__BLOG_APP_V='1';</script>
 </head>
@@ -93,6 +93,14 @@
   </section>
 
   <canvas id="code-rain"></canvas>
+  <div id="video-compare" aria-hidden="true">
+    <canvas id="compare-original"></canvas>
+    <div id="compare-handle">
+      <span class="compare-grip">⟷</span>
+    </div>
+    <span class="compare-tag compare-tag-left">解析画面</span>
+    <span class="compare-tag compare-tag-right">原视频</span>
+  </div>
   <video id="ascii-video-source" class="ascii-video-source" muted loop playsinline preload="auto" aria-hidden="true">
     <source src="/video/ascii.mp4?v=20250617-birds-v1" type="video/mp4">
   </video>
@@ -124,7 +132,7 @@
     })();
   </script>
   <script src="/js/dancers.js?v=9"></script>
-  <script src="/js/ascii-video.js?v=9"></script>
+  <script src="/js/ascii-video.js?v=10"></script>
   <script src="/js/media-loader.js?v=9"></script>
   <script src="/js/dance.js?v=17"></script>
   <script src="/js/bug-hunt.js?v=9"></script>

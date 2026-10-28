@@ -308,6 +308,101 @@ body.ascii-video-active #code-rain {
   opacity: 0.95;
 }
 
+/* 播放对比滑块：左边解析画面 / 右边原视频 */
+#video-compare {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+body.ascii-video-active #video-compare {
+  opacity: 1;
+}
+
+#compare-original {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#compare-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 28px;
+  transform: translateX(-50%);
+  pointer-events: auto;
+  touch-action: none;
+  cursor: ew-resize;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+body.ascii-video-active #compare-handle {
+  opacity: 1;
+}
+
+#compare-handle::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  transform: translateX(-50%);
+  background: rgba(0, 245, 255, 0.9);
+  box-shadow: 0 0 12px rgba(0, 245, 255, 0.8);
+}
+
+.compare-grip {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(10, 14, 23, 0.85);
+  border: 1px solid rgba(0, 245, 255, 0.6);
+  color: var(--neon-cyan);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+
+.compare-tag {
+  position: absolute;
+  top: 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  color: rgba(0, 245, 255, 0.75);
+  background: rgba(10, 14, 23, 0.55);
+  border: 1px solid rgba(0, 245, 255, 0.25);
+  border-radius: 999px;
+  padding: 0.25rem 0.7rem;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+body.ascii-video-active .compare-tag {
+  opacity: 1;
+}
+
+.compare-tag-left { left: 1rem; }
+
+.compare-tag-right {
+  right: 1rem;
+  color: rgba(255, 255, 255, 0.75);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
 .ascii-video-source {
   position: fixed;
   width: 1px;
